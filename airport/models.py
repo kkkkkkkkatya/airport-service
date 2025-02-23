@@ -26,7 +26,7 @@ class Airplane(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
-    airplane_type = models.ForeignKey("AirplaneType", on_delete=models.CASCADE, related_name="airplane_types")
+    airplane_type = models.ForeignKey("AirplaneType", on_delete=models.CASCADE, related_name="airplanes")
 
     class Meta:
         ordering = ["name"]
@@ -48,8 +48,8 @@ class Airport(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes")
-    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes")
+    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes_from")
+    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes_to")
     distance = models.IntegerField()
 
     class Meta:
