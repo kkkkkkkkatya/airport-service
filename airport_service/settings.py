@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework",
     #new apps
     "airport",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -106,6 +107,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
+
+AUTH_USER_MODEL = "user.User"
 
 LANGUAGE_CODE = "en-us"
 
