@@ -55,6 +55,16 @@ class Route(models.Model):
     class Meta:
         unique_together = ("source", "destination")
 
+    def clean(self):
+        if self.source == self.destination:
+            raise ValidationError({
+                "destination": "Source and destination cannot be the same airport."
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.source.name} -> {self.destination.name}"
 
