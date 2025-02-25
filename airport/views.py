@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import F, Count
 from django.shortcuts import render
 from rest_framework import viewsets, mixins
@@ -59,6 +61,15 @@ class AirplaneViewSet(
 
         return AirplaneSerializer
 
+    def get_queryset(self):
+        airplane_type = self.request.query_params.get("airplane_type")
+        queryset = self.queryset
+
+        if airplane_type:
+            queryset = queryset.filter(airplane_type_id=airplane_type)
+
+        return queryset.distinct()
+
 
 class AirportViewSet(
     mixins.CreateModelMixin,
@@ -67,6 +78,15 @@ class AirportViewSet(
 ):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
+
+    def get_queryset(self):
+        closest_big_city = self.request.query_params.get("closest_big_city")
+        queryset = self.queryset
+
+        if closest_big_city:
+            queryset = queryset.filter(closest_big_city__icontains=closest_big_city)
+
+        return queryset.distinct()
 
 
 class RouteViewSet(
@@ -82,6 +102,18 @@ class RouteViewSet(
             return RouteReadSerializer
 
         return RouteSerializer
+
+    def get_queryset(self):
+        source = self.request.query_params.get("source")
+        destination = self.request.query_params.get("destination")
+        queryset = self.queryset
+
+        if source:
+            queryset = queryset.filter(source_id=source)
+        if destination:
+            queryset = queryset.filter(destination_id=destination)
+
+        return queryset.distinct()
 
 
 class FlightViewSet(
@@ -105,6 +137,26 @@ class FlightViewSet(
 
         return FlightSerializer
 
+    def get_queryset(self):
+        airplane = self.request.query_params.get("airplane")
+        route = self.request.query_params.get("route")
+        arrival_time = self.request.query_params.get("arrival_time")
+        departure_time = self.request.query_params.get("departure_time")
+        queryset = self.queryset
+
+        if airplane:
+            queryset = queryset.filter(airplane_id=airplane)
+        if route:
+            queryset = queryset.filter(route_id=route)
+        if arrival_time:
+            arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d").date()
+            queryset = queryset.filter(arrival_time__date=arrival_time)
+        if departure_time:
+            departure_time = datetime.strptime(departure_time, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=departure_time)
+
+        return queryset.distinct()
+
 
 class OrderPagination(PageNumberPagination):
     page_size = 10
@@ -117,7 +169,7 @@ class OrderViewSet(
     GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related(
-        #"tickets__flight__route",
+        "tickets__flight__route",
         "tickets__flight__airplane"
     )
     serializer_class = OrderSerializer
