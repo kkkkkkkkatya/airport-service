@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from django.shortcuts import render
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -96,9 +97,21 @@ class AirplaneViewSet(
         queryset = self.queryset
 
         if airplane_type:
-            queryset = queryset.filter(airplane_type_id=airplane_type)
+            queryset = queryset.filter(airplane_type_id=int(airplane_type))
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "airplane_type",
+                type=OpenApiTypes.INT,
+                description="Filter by airplane_type id (ex. ?airplane_type=2)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class AirportViewSet(
@@ -118,6 +131,18 @@ class AirportViewSet(
             queryset = queryset.filter(closest_big_city__icontains=closest_big_city)
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "closest_big_city",
+                type=OpenApiTypes.STR,
+                description="Filter by closest_big_city (ex. ?closest_big_city=LA)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class RouteViewSet(
@@ -141,11 +166,28 @@ class RouteViewSet(
         queryset = self.queryset
 
         if source:
-            queryset = queryset.filter(source_id=source)
+            queryset = queryset.filter(source_id=int(source))
         if destination:
-            queryset = queryset.filter(destination_id=destination)
+            queryset = queryset.filter(destination_id=int(destination))
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source",
+                type=OpenApiTypes.INT,
+                description="Filter by source (Airport) id (ex. ?source=2)",
+            ),
+            OpenApiParameter(
+                "destination",
+                type=OpenApiTypes.INT,
+                description="Filter by destination (Airport) id (ex. ?destination=2)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class FlightViewSet(
@@ -178,9 +220,9 @@ class FlightViewSet(
         queryset = self.queryset
 
         if airplane:
-            queryset = queryset.filter(airplane_id=airplane)
+            queryset = queryset.filter(airplane_id=int(airplane))
         if route:
-            queryset = queryset.filter(route_id=route)
+            queryset = queryset.filter(route_id=int(route))
         if arrival_time:
             arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d").date()
             queryset = queryset.filter(arrival_time__date=arrival_time)
@@ -189,6 +231,39 @@ class FlightViewSet(
             queryset = queryset.filter(departure_time__date=departure_time)
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "airplane",
+                type=OpenApiTypes.INT,
+                description="Filter by airplane id (ex. ?airplane=2)",
+            ),
+            OpenApiParameter(
+                "route",
+                type=OpenApiTypes.INT,
+                description="Filter by route id (ex. ?route=2)",
+            ),
+            OpenApiParameter(
+                "arrival_time",
+                type=OpenApiTypes.DATE,
+                description=(
+                        "Filter by arrival_time of Flight"
+                        "(ex. ?arrival_time=2022-10-23)"
+                ),
+            ),
+            OpenApiParameter(
+                "departure_time",
+                type=OpenApiTypes.DATE,
+                description=(
+                        "Filter by departure_time of Flight"
+                        "(ex. ?departure_time=2022-10-23)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class OrderPagination(PageNumberPagination):
