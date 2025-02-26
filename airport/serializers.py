@@ -31,13 +31,19 @@ class AirplaneReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "airplane_type", "rows", "seats_in_row", "capacity")
+        fields = ("id", "name", "airplane_type", "rows", "seats_in_row", "capacity", "image")
 
 
 class AirplaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airplane
         fields = ("id", "name", "airplane_type", "rows", "seats_in_row", "capacity")
+
+
+class AirplaneImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airplane
+        fields = ("id", "image")
 
 
 class AirportSerializer(serializers.ModelSerializer):
@@ -104,6 +110,7 @@ class FlightListSerializer(FlightSerializer):
     airplane_capacity = serializers.IntegerField(
         source="airplane.capacity", read_only=True
     )
+    airplane_image = serializers.ImageField(source="airplane.image", read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
     number_of_crew = serializers.IntegerField(read_only=True)
 
@@ -116,6 +123,7 @@ class FlightListSerializer(FlightSerializer):
             "arrival_time",
             "airplane_name",
             "airplane_capacity",
+            "airplane_image",
             "tickets_available",
             "number_of_crew"
         )
