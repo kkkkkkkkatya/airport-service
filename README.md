@@ -3,15 +3,23 @@
 ## Description
 The Airplane Service REST API is a web-based application that provides functionalities for managing airplane operations, including registration, flight tracking, and user management. It offers a robust and secure platform for users to interact with airplane data efficiently.
 
+## **Features**
+- JWT authenticated
+- Admin panel /admin/
+- Running using docker or localhost
+- The interactive API documentation powered by Swagger at `http://127.0.0.1:8000/api/doc/swagger/`.
+- Managing orders and tickets
+- Creating airplane types and airplanes with images
+- Creating airports
+- Creating routes 
+- Adding flights and crew to them
+- Filtering airplanes, airports, routes and flights
+
 
 ### **Test User Credentials**
 To explore the platform without signing up, use the following test account:
 - **Email:** `testuser@example.com`
 - **Password:** `testpassword`
-
-## Visuals
-### API Documentation
-You can find the interactive API documentation powered by Swagger at `http://127.0.0.1:8000/api/doc/swagger/`.
 
 ## Installation
 ### Requirements
